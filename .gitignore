@@ -6,6 +6,3 @@ __pycache__/
 .DS_Store
 *.log
 data/
-*.csv
-*.zip
-data/

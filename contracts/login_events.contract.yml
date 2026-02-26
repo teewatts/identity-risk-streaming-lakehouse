@@ -1,0 +1,92 @@
+dataset_name: login_events
+layer: silver
+owner: Terry Watts
+status: in_progress
+
+description: >
+  Standardized login event dataset derived from the Bronze ingestion layer.
+  Used as the primary clean input for Gold risk analytics and reporting.
+
+source:
+  type: csv
+  location: /Volumes/workspace/default/identity_risk_raw/rba_sample_500k.csv
+
+sla:
+  freshness: batch_loaded_for_development
+  quality_expectation: basic_field_validation
+
+fields:
+  - name: event_ts
+    type: timestamp
+    required: true
+    description: Normalized login event timestamp
+
+  - name: user_id
+    type: string
+    required: true
+    description: User identifier from the source dataset
+
+  - name: ip_address
+    type: string
+    required: true
+    description: Source IP address for the login attempt
+
+  - name: country
+    type: string
+    required: false
+    description: Country associated with the login attempt
+
+  - name: region
+    type: string
+    required: false
+    description: Region associated with the login attempt
+
+  - name: city
+    type: string
+    required: false
+    description: City associated with the login attempt
+
+  - name: asn
+    type: string
+    required: false
+    description: Autonomous System Number metadata
+
+  - name: user_agent_string
+    type: string
+    required: false
+    description: Raw user agent string
+
+  - name: browser_name_version
+    type: string
+    required: false
+    description: Browser name and version
+
+  - name: os_name_version
+    type: string
+    required: false
+    description: Operating system name and version
+
+  - name: device_type
+    type: string
+    required: false
+    description: Device classification
+
+  - name: rtt_ms
+    type: double
+    required: false
+    description: Round-trip time in milliseconds
+
+  - name: login_successful
+    type: boolean
+    required: false
+    description: Indicates whether the login succeeded
+
+  - name: is_attack_ip
+    type: boolean
+    required: false
+    description: Indicates whether the source IP is flagged as an attack IP
+
+  - name: is_account_takeover
+    type: boolean
+    required: false
+    description: Indicates whether the event is flagged as account takeover related

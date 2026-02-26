@@ -1,51 +1,52 @@
-# Databricks Gold KPI Aggregates - RBA sample
+# Databricks Gold Risk Signals - failed login spikes by IP
 
 from pyspark.sql.functions import (
     col,
     window,
     count,
     sum as Fsum,
-    avg,
     when
 )
 
-gold_table_name = "gold_login_kpis_5m"
+gold_table_name = "gold_fail_spikes_by_ip_5m"
 
 silver_df = spark.table("silver_login_events")
 
-# Build 5-minute KPI windows
-gold_kpis_df = (
+# Aggregate failed login activity by IP over 5-minute windows
+gold_fail_spikes_df = (
     silver_df
-    .groupBy(window(col("event_ts"), "5 minutes"))
+    .groupBy(
+        window(col("event_ts"), "5 minutes"),
+        col("ip_address")
+    )
     .agg(
         count("*").alias("login_attempts"),
         Fsum(when(col("login_successful") == False, 1).otherwise(0)).alias("failed_logins"),
         Fsum(when(col("login_successful") == True, 1).otherwise(0)).alias("successful_logins"),
-        avg(col("rtt_ms")).alias("avg_rtt_ms"),
         Fsum(when(col("is_attack_ip") == True, 1).otherwise(0)).alias("attack_ip_events"),
         Fsum(when(col("is_account_takeover") == True, 1).otherwise(0)).alias("account_takeover_events")
     )
     .withColumn(
-        "success_rate",
-        col("successful_logins") / col("login_attempts")
+        "failure_rate",
+        when(col("login_attempts") > 0, col("failed_logins") / col("login_attempts")).otherwise(None)
     )
     .select(
         col("window.start").alias("window_start"),
         col("window.end").alias("window_end"),
+        "ip_address",
         "login_attempts",
         "failed_logins",
         "successful_logins",
-        "success_rate",
-        "avg_rtt_ms",
+        "failure_rate",
         "attack_ip_events",
         "account_takeover_events"
     )
 )
 
-display(gold_kpis_df)
+display(gold_fail_spikes_df)
 
 (
-    gold_kpis_df.write
+    gold_fail_spikes_df.write
     .format("delta")
     .mode("overwrite")
     .saveAsTable(gold_table_name)
@@ -54,5 +55,8 @@ display(gold_kpis_df)
 print(f"Gold table created: {gold_table_name}")
 
 # Validation query
-spark.table("gold_login_kpis_5m").printSchema()
-display(spark.table("gold_login_kpis_5m").orderBy("window_start"))
+display(
+    spark.table("gold_fail_spikes_by_ip_5m")
+    .filter("failed_logins >= 3")
+    .orderBy(col("failed_logins").desc(), col("failure_rate").desc())
+)
