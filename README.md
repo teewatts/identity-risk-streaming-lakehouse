@@ -2,7 +2,7 @@
 
 A streaming-first security analytics project built in Databricks using the Kaggle Risk-Based Authentication (RBA) dataset.
 
-This project is designed to explore modern data engineering patterns by building a medallion-style lakehouse pipeline for identity-related login events. The goal is to ingest, transform, validate, and analyze login activity in a way that supports risk analytics, operational visibility, and dashboard-ready reporting.
+This project explores modern data engineering patterns by building a medallion-style lakehouse pipeline for identity-related login events. The goal is to ingest, transform, validate, and analyze login activity in a way that supports risk analytics, operational visibility, and dashboard-ready reporting.
 
 ## Project Goals
 
@@ -12,22 +12,57 @@ This project is designed to explore modern data engineering patterns by building
 - Create reporting queries and visualizations
 - Document architecture, assumptions, and operational considerations
 
-## Planned Architecture
+## Current Progress
+
+The initial MVP is complete and includes:
+
+- Bronze ingestion from a Unity Catalog managed volume
+- Silver normalization and validation
+- Silver quarantine table for invalid records
+- Gold KPI aggregates in 5-minute windows
+- Gold IP-level failure spike analysis
+- Gold user-level risk scoring
+- Reporting queries and initial visualizations for:
+  - login attempts over time
+  - failed logins over time
+  - top risky IPs
+  - top risky users
+  - country-level attack activity
+
+## Architecture Overview
 
 ### Bronze
-Raw login events ingested with minimal transformation, including metadata such as ingestion timestamp and source file.
+
+Raw login events are ingested with minimal transformation, including:
+- ingestion timestamp
+- source file path
+- ingestion date
 
 ### Silver
-Cleaned and standardized login event data with normalized timestamps, validated fields, deduplication logic, and quarantine handling for invalid records.
+
+Cleaned and standardized login event data with:
+- normalized timestamps
+- field validation
+- standardized field names
+- type casting for numeric and boolean values
+- quarantine handling for invalid records
 
 ### Gold
-Analytics-ready tables focused on security and risk insights, including login KPIs, failed login spikes, suspicious login patterns, and account takeover indicators.
+
+Analytics-ready tables focused on security and risk insights, including:
+- login KPIs
+- failed login spikes by IP
+- user-level risk scoring
+- account takeover indicators
+- attack IP activity trends
 
 ## Tech Stack
 
 - Databricks
 - PySpark
 - Delta Lake
+- Unity Catalog volumes
+- SQL
 - Structured Streaming concepts
 - Kaggle Risk-Based Authentication (RBA) dataset
 
@@ -35,17 +70,18 @@ Analytics-ready tables focused on security and risk insights, including login KP
 
 The source dataset is the Kaggle Risk-Based Authentication (RBA) dataset. Raw source data is not stored in this repository. This repository contains project code, documentation, and setup guidance only.
 
+Development is currently based on a 500K-row sample of the source dataset.
+
 ## Current Status
 
-**In Progress**
+**MVP Complete**
 
-The initial focus is on building the Bronze, Silver, and Gold pipeline using a 500K-row sample of the source dataset.
+The first version of the Bronze, Silver, and Gold pipeline is working end to end and includes initial reporting outputs.
 
-## Planned Next Steps
+## Next Steps
 
-- [ ] Upload sample dataset to Databricks
-- [ ] Build Bronze ingestion notebook
-- [ ] Build Silver normalization and validation notebook
-- [ ] Build Gold risk analytics tables
-- [ ] Add dashboard queries and charts
-- [ ] Add architecture notes and runbook
+- [ ] Add new device and new browser detection by user
+- [ ] Expand data contract and ownership metadata
+- [ ] Add additional documentation and operational runbook details
+- [ ] Improve dashboard polish and layout
+- [ ] Scale to additional input files or larger samples
