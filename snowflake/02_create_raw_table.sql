@@ -1,1 +1,21 @@
+USE DATABASE IDENTITY_RISK_DB;
+USE SCHEMA RAW_LAKEHOUSE;
 
+CREATE OR REPLACE TABLE LOGIN_EVENTS_RAW (
+  RTT_MS                  STRING,
+  LOGIN_TIMESTAMP         STRING,
+  USER_ID                 STRING,
+  UNUSED_COL              STRING,
+  IP_ADDRESS              STRING,
+  COUNTRY                 STRING,
+  REGION                  STRING,
+  CITY                    STRING,
+  ASN                     STRING,
+  USER_AGENT_STRING       STRING,
+  BROWSER_NAME_VERSION    STRING,
+  OS_NAME_VERSION         STRING,
+  DEVICE_TYPE             STRING,
+  LOGIN_SUCCESSFUL        STRING,
+  IS_ATTACK_IP            STRING,
+  IS_ACCOUNT_TAKEOVER     STRING
+);
