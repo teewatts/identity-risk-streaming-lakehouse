@@ -24,12 +24,12 @@ The initial MVP is complete and includes:
 - Gold KPI aggregates in 5-minute windows
 - Gold IP-level failure spike analysis
 - Gold user-level risk scoring
-- Reporting queries and initial visualizations for:
+- Reporting queries and visualizations for:
   - login attempts over time
   - failed logins over time
-  - top risky IPs
-  - top risky users
-  - country-level attack activity
+  - top risky IPs by failed logins
+  - top risky users (table)
+  - attack IP activity by country
 
 ### Companion Snowflake Implementation
 
@@ -38,7 +38,7 @@ A Snowflake companion implementation is included under `snowflake/` and covers:
 - internal stage upload and bulk load using `COPY INTO`
 - raw landing table
 - Silver-style normalized table
-- Gold KPI aggregates
+- Gold KPI aggregates (5-minute windows)
 - Gold user-level risk scoring
 
 ## Architecture Overview
@@ -67,6 +67,34 @@ Analytics-ready tables focused on security and risk insights, including:
 - user-level risk scoring
 - account takeover indicators
 - attack IP activity trends
+
+## Visualizations (Databricks)
+
+### Login Attempts (5 min windows)
+![Login Attempts](docs/images/databricks_kpi_login_attempts.png)
+
+### Failed Logins (5 min windows)
+![Failed Logins](docs/images/databricks_kpi_failed_logins.png)
+
+### Top Risky IPs by Failed Logins
+![Top Risky IPs](docs/images/databricks_top_risky_ips_failed_logins.png)
+
+### Attack IP Events by Country
+![Attack IP Events by Country](docs/images/databricks_country_attack_ip_events.png)
+
+### Top Risky Users (Table)
+![Top Risky Users](docs/images/databricks_top_risky_users_table.png)
+
+## Visualizations (Snowflake)
+
+### Gold KPIs (5 min windows)
+![Snowflake Gold KPIs](docs/images/snowflake_gold_login_kpis_5m.png)
+
+### Top Risky Users
+![Snowflake Risky Users](docs/images/snowflake_gold_risk_signals_by_user.png)
+
+### Results Snapshot
+![Snowflake Results Snapshot](docs/images/snowflake_results_snapshot.png)
 
 ## Tech Stack
 
@@ -117,11 +145,12 @@ On the 500K-row sample:
 
 **MVP Complete**
 
-The first version of the Bronze, Silver, and Gold pipeline is working end to end and includes initial reporting outputs in Databricks, plus a companion Snowflake implementation.
+The first version of the Bronze, Silver, and Gold pipeline is working end to end and includes reporting outputs in Databricks, plus a companion Snowflake implementation.
 
 ## Next Steps
 
 - [ ] Add new device and new browser detection by user
+- [ ] Integrate dbt models for Silver and Gold tables (Snowflake first)
 - [ ] Expand data contract and ownership metadata
 - [ ] Add additional documentation and operational runbook details
 - [ ] Improve dashboard polish and layout
