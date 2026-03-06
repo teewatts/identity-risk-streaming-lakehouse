@@ -4,6 +4,8 @@ A streaming-first security analytics project built in Databricks using the Kaggl
 
 This project explores modern data engineering patterns by building a medallion-style lakehouse pipeline for identity-related login events. The goal is to ingest, transform, validate, and analyze login activity in a way that supports risk analytics, operational visibility, and dashboard-ready reporting.
 
+This repository also includes a Snowflake companion implementation to demonstrate equivalent warehouse-oriented ingestion and modeling patterns.
+
 ## Project Goals
 
 - Build a Bronze layer for raw login event ingestion
@@ -22,12 +24,22 @@ The initial MVP is complete and includes:
 - Gold KPI aggregates in 5-minute windows
 - Gold IP-level failure spike analysis
 - Gold user-level risk scoring
-- Reporting queries and initial visualizations for:
+- Reporting queries and visualizations for:
   - login attempts over time
   - failed logins over time
-  - top risky IPs
-  - top risky users
-  - country-level attack activity
+  - top risky IPs by failed logins
+  - top risky users (table)
+  - attack IP activity by country
+
+### Companion Snowflake Implementation
+
+A Snowflake companion implementation is included under `snowflake/` and covers:
+
+- internal stage upload and bulk load using `COPY INTO`
+- raw landing table
+- Silver-style normalized table
+- Gold KPI aggregates (5-minute windows)
+- Gold user-level risk scoring
 
 ## Architecture Overview
 
@@ -56,12 +68,41 @@ Analytics-ready tables focused on security and risk insights, including:
 - account takeover indicators
 - attack IP activity trends
 
+## Visualizations (Databricks)
+
+### Login Attempts (5 min windows)
+![Login Attempts](docs/images/databricks_kpi_login_attempts.png)
+
+### Failed Logins (5 min windows)
+![Failed Logins](docs/images/databricks_kpi_failed_logins.png)
+
+### Top Risky IPs by Failed Logins
+![Top Risky IPs](docs/images/databricks_top_risky_ips_failed_logins.png)
+
+### Attack IP Events by Country
+![Attack IP Events by Country](docs/images/databricks_country_attack_ip_events.png)
+
+### Top Risky Users (Table)
+![Top Risky Users](docs/images/databricks_top_risky_users_table.png)
+
+## Visualizations (Snowflake)
+
+### Gold KPIs (5 min windows)
+![Snowflake Gold KPIs](docs/images/snowflake_gold_login_kpis_5m.png)
+
+### Top Risky Users
+![Snowflake Risky Users](docs/images/snowflake_gold_risk_signals_by_user.png)
+
+### Results Snapshot
+![Snowflake Results Snapshot](docs/images/snowflake_results_snapshot.png)
+
 ## Tech Stack
 
 - Databricks
 - PySpark
 - Delta Lake
 - Unity Catalog volumes
+- Snowflake (companion implementation)
 - SQL
 - Structured Streaming concepts
 - Kaggle Risk-Based Authentication (RBA) dataset
@@ -72,15 +113,44 @@ The source dataset is the Kaggle Risk-Based Authentication (RBA) dataset. Raw so
 
 Development is currently based on a 500K-row sample of the source dataset.
 
+## Quickstart
+
+### Databricks
+
+High-level flow:
+1. Upload the sample CSV into a Unity Catalog volume
+2. Run notebooks in order:
+   - `01_bronze_ingest`
+   - `02_silver_normalize`
+   - `03_gold_kpis`
+   - `04_gold_risk_signals`
+   - `05_gold_user_risk`
+3. Run the dashboard queries and create visualizations from the Gold tables
+
+### Snowflake
+
+High-level flow:
+1. Upload the sample CSV to a named internal stage
+2. Run scripts in order from `snowflake/`:
+   - `00_setup.sql` through `06_create_gold_user_risk.sql`
+
+## Results Snapshot
+
+On the 500K-row sample:
+- 500,000 rows successfully loaded and modeled end to end
+- 49,125 events were flagged as attack-IP activity
+- 2 events were flagged as account takeover activity
+
 ## Current Status
 
 **MVP Complete**
 
-The first version of the Bronze, Silver, and Gold pipeline is working end to end and includes initial reporting outputs.
+The first version of the Bronze, Silver, and Gold pipeline is working end to end and includes reporting outputs in Databricks, plus a companion Snowflake implementation.
 
 ## Next Steps
 
 - [ ] Add new device and new browser detection by user
+- [ ] Integrate dbt models for Silver and Gold tables (Snowflake first)
 - [ ] Expand data contract and ownership metadata
 - [ ] Add additional documentation and operational runbook details
 - [ ] Improve dashboard polish and layout
