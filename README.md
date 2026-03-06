@@ -74,7 +74,7 @@ Analytics-ready tables focused on security and risk insights, including:
 ![Login Attempts](docs/images/databricks_kpi_login_attempts.png)
 
 ### Failed Logins (5 min windows)
-![Failed Logins](docs/images/databricks_kpi_failed_logins.png)
+![Failed Logins](docs/images/databricks_kpi_failed_login_attempts.png)
 
 ### Top Risky IPs by Failed Logins
 ![Top Risky IPs](docs/images/databricks_top_risky_ips_failed_logins.png)
