@@ -41,6 +41,16 @@ A Snowflake companion implementation is included under `snowflake/` and covers:
 - Gold KPI aggregates (5-minute windows)
 - Gold user-level risk scoring
 
+### dbt Modeling Layer (Snowflake)
+
+A dbt project is included under `dbt/identity_risk_dbt/` to operationalize the Snowflake transformation layer as version-controlled, repeatable models with tests.
+
+- Source defined for `LOGIN_EVENTS_RAW`
+- Silver model: `login_events_silver`
+- Gold models: `gold_login_kpis_5m`, `gold_risk_signals_by_user`
+- Data quality tests: not-null and accepted-values checks
+
+
 ## Architecture Overview
 
 ### Bronze
@@ -103,6 +113,7 @@ Analytics-ready tables focused on security and risk insights, including:
 - Delta Lake
 - Unity Catalog volumes
 - Snowflake (companion implementation)
+- dbt (Snowflake modeling + tests)
 - SQL
 - Structured Streaming concepts
 - Kaggle Risk-Based Authentication (RBA) dataset
@@ -134,19 +145,30 @@ High-level flow:
 2. Run scripts in order from `snowflake/`:
    - `00_setup.sql` through `06_create_gold_user_risk.sql`
 
+### dbt (Snowflake)
+
+High-level flow:
+1. Ensure the raw Snowflake table exists: `IDENTITY_RISK_DB.RAW_LAKEHOUSE.LOGIN_EVENTS_RAW`
+2. Set environment variables used by the dbt profile:
+   - `SNOWFLAKE_HOST`, `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_USER`, `SNOWFLAKE_PASSWORD`, `SNOWFLAKE_ROLE`, `SNOWFLAKE_WAREHOUSE`
+3. Run from `dbt/identity_risk_dbt/`:
+   - `dbt debug`
+   - `dbt run`
+   - `dbt test`
+
 ## Results Snapshot
 
 On the 500K-row sample:
 - 500,000 rows successfully loaded and modeled end to end
 - 49,125 events were flagged as attack-IP activity
 - 2 events were flagged as account takeover activity
+- dbt models and tests run successfully (Snowflake)
 
 ## Current Status
 
 **MVP Complete**
 
-The first version of the Bronze, Silver, and Gold pipeline is working end to end and includes reporting outputs in Databricks, plus a companion Snowflake implementation.
-
+The first version of the Bronze, Silver, and Gold pipeline is working end to end and includes reporting outputs in Databricks, a companion Snowflake implementation, and a dbt modeling layer (Snowflake) with tests.
 ## Next Steps
 
 - [ ] Add new device and new browser detection by user
