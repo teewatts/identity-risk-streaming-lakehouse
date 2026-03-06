@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: login_events_silver
+    description: "Cleaned and typed login events derived from LOGIN_EVENTS_RAW."
+    columns:
+      - name: event_ts
+        tests: [not_null]
+      - name: user_id
+        tests: [not_null]
+      - name: ip_address
+        tests: [not_null]
+      - name: login_successful
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true, false]

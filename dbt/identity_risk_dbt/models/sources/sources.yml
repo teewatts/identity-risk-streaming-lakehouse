@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: identity_risk
+    database: IDENTITY_RISK_DB
+    schema: RAW_LAKEHOUSE
+    tables:
+      - name: LOGIN_EVENTS_RAW
+        description: "Raw staged login events loaded via COPY INTO."
